@@ -1,21 +1,44 @@
 var pipermail = require('pipermail');
 
+var user = process.argv[2];
+var pass = process.argv[3];
+if ((user && !pass) || user === '-h' || user === '--help' || user === '-?' || user === '/?') {
+  console.warn('Usage:');
+  console.warn();
+  console.warn('  To scan for new messages without commiting:');
+  console.warn();
+  console.warn('    esdiscuss-bot');
+  console.warn();
+  console.warn('  To commit new messages:');
+  console.warn();
+  console.warn('    esdiscuss-bot user password');
+  process.exit((user && !pass) ? 2 : 0);
+}
 var stream = pipermail('https://mail.mozilla.org/pipermail/es-discuss/', 
     {progress: false, cache: true})
   .pipe(require('./lib/pipermail-filters').spam())
   .pipe(require('./lib/pipermail-filters').fixSubjects())
   .pipe(require('./lib/pipermail-filters').fixDates())
   .pipe(require('./lib/pipermail-filters').after('40 days'))
-  .pipe(require('./lib/pipermail-filters').notExists())
-  .pipe(require('./lib/pipermail-output')({
-      user: {type: 'basic', username: 'user', password: 'password'},
-      organisation: 'esdiscuss',
-      team: '337802'
-    }))
-//  .pipe(stringify())
-  .pipe(process.stdout);
-//stream.on('error', def.reject.bind(def));
-//stream.on('end', def.resolve.bind(def, null));
+  .pipe(require('./lib/pipermail-filters').notExists());
+
+if (user && pass) {
+  stream = stream
+    .pipe(require('./lib/pipermail-output')({
+        user: {type: 'basic', username: user, password: pass},
+        organisation: 'esdiscuss',
+        team: '337802'
+      }));
+}
+
+stream.pipe(jsonify())
+      .pipe(process.stdout);
+
+function jsonify() {
+  return require('through')(function (message) {
+    this.queue(JSON.stringify(message.header) + '\n');
+  })
+}
 
 function stringify() {
   return require('through')(function (message) {
