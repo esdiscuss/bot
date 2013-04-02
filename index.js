@@ -13,7 +13,8 @@ function execute(options) {
   var stream = pipermail(source, {progress: false, cache: true})
     .pipe(filters.spam())
     .pipe(filters.fixSubjects())
-    .pipe(filters.fixDates());
+    .pipe(filters.fixDates())
+    .pipe(filters.fixID());
 
   if (age) stream = stream.pipe(filters.after(age));
 
