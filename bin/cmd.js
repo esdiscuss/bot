@@ -64,7 +64,7 @@ if (args.h || args.H || args['?'] || args.help) {
 }
 
 if (args.save) {
-  fs.writeFileSync(require.resolve('./settings.json'), JSON.stringify({
+  fs.writeFileSync(__dirname + '/settings.json', JSON.stringify({
     source: args.source,
     organisation: args.organisation,
     team: args.team,
@@ -75,7 +75,7 @@ if (args.save) {
   process.exit(0);
 }
 if (args.clear) {
-  fs.writeFileSync(require.resolve('./settings.json'), JSON.stringify(defaultSettings, null, 2));
+  fs.writeFileSync(__dirname + '/settings.json', JSON.stringify(defaultSettings, null, 2));
   process.exit(0);
 }
 
