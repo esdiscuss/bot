@@ -38,28 +38,47 @@ function messages(options) {
 
 var mongojs = require('mongojs');
 // { _id: path, subjectID, subject, date, from }
-/*
+
+var through = require('through');
 function topics(options) {
   var source = options.source || 'https://mail.mozilla.org/pipermail/es-discuss/';
   var db = mongojs(options.db, ['messages', 'topics']);
 
   var running = 0;
-  var stream = pipermail(source, {progress: false, cache: true}).pipe(filters());
+  var stream = pipermail(source, {progress: false, cache: true})
+    .pipe(filters())
+    .pipe(through())
     .pipe(through(function (message) {
-      if (running++ === 0) this.pause();
-      db.messages.create({
-        _id: message.path,
-        subjectID: tag(message.header.subject)
-      }, function (err) {
-        console.error(err.stack || err.message || err);
-        if (--running === 0) this.resume();
+      var self = this;
+      console.warn('start: ' + message.path);
+      if (5 === running++) self.pause();
+      var meta = {};
+      Object.keys(message.header)
+        .forEach(function (key) {
+          meta[key] = message.header[key];
+        });
+      meta._id = message.path;
+      meta.subjectID = message.subjectID;
+      meta.month = message.month;
+      meta.id = message.id;
+      //console.dir(meta);
+      db.messages.insert(meta, {safe: true}, function (err) {
+        if (err && err.code != 11000) { //if error and not "document already exists"
+          console.error(err.stack || err.message || err);
+          console.dir(err);
+        }
+        else console.warn('end: ' + message.path);
+        if (--running === 5) self.resume();
       });
     }));
   stream.on('error', function (e) {
     console.error(e.stack || e.message || e);
   });
 }
-*/
+//esdiscuss
+//c59d0cf0-520e-4198-a41d-5819eef1cab8
+topics(require('./bin/settings.json'));
+
 function tag(subject) {
   return subject.replace(/[^a-z]+/gi, '').replace(/fwd?/gi, '').replace(/re/gi, '');
 }
