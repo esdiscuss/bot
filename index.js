@@ -38,6 +38,7 @@ function messages(options) {
 
 var mongojs = require('mongojs');
 // { _id: path, subjectID, subject, date, from }
+/*
 function topics(options) {
   var source = options.source || 'https://mail.mozilla.org/pipermail/es-discuss/';
   var db = mongojs(options.db, ['messages', 'topics']);
@@ -58,6 +59,7 @@ function topics(options) {
     console.error(e.stack || e.message || e);
   });
 }
+*/
 function tag(subject) {
   return subject.replace(/[^a-z]+/gi, '').replace(/fwd?/gi, '').replace(/re/gi, '');
 }
