@@ -11,51 +11,58 @@ try {
 } catch (ex) {}
 
 var optimist = require('optimist')
-  .boolean('H')
-  .alias('H', 'h')
-  .alias('H', 'help')
-  .alias('H', '?')
-  .describe('H', 'Dispalay usage info')
+  .boolean('help')
+  .alias('help', 'H')
+  .alias('help', 'h')
+  .alias('help', 'help')
+  .alias('help', '?')
+  .describe('help', 'Dispalay usage info')
 
-  .boolean('S')
-  .alias('S', 'save')
-  .describe('S', 'Save settings except dry-run and help')
-  .boolean('C')
-  .alias('C', 'clear')
-  .describe('C', 'Remove any saved settings')
+  .boolean('save')
+  .alias('save', 'S')
+  .describe('save', 'Save settings except dry-run and help')
 
-  .boolean('D')
-  .alias('D', 'dry-run')
-  .describe('D', 'Do not commit to GitHub (can ommit user, password etc.)')
+  .boolean('clear')
+  .alias('clear', 'C')
+  .describe('clear', 'Remove any saved settings')
 
-  .string('s')
-  .alias('s', 'source')
-  .describe('s', 'The pipermail url to read messages from')
-  .default('s', settings.source || undefined)
-  .demand('s')
+  .boolean('dry-run')
+  .alias('dry-run', 'D')
+  .describe('dry-run', 'Do not commit to GitHub (can ommit user, password etc.)')
 
-  .string('u')
-  .alias('u', 'user')
-  .describe('u', 'The username to commit to GitHub with')
-  .default('u', settings.user || undefined)
-  .string('p')
-  .alias('p', 'pass')
-  .describe('p', 'The password to commit to GitHub with')
-  .default('p', settings.pass || undefined)
-  .string('o')
-  .alias('o', 'organisation')
-  .describe('o', 'The organisation the repositories belong under.')
-  .default('o', settings.organisation || undefined)
-  .string('t')
-  .alias('t', 'team')
-  .describe('t', 'The team to be given commit access to newly created repos')
-  .default('t', settings.team || undefined)
+  .string('source')
+  .alias('source', 's')
+  .describe('source', 'The pipermail url to read messages from')
+  .default('source', settings.source || undefined)
+  .demand('source')
 
-  .string('a')
-  .alias('a', 'age')
-  .describe('a', 'The maximum age of messages to check')
-  .default('a', settings.age || undefined)
-  .demand('a');
+  .string('user')
+  .alias('user', 'u')
+  .describe('user', 'The username to commit to GitHub with')
+  .default('user', settings.user || undefined)
+  .string('pass')
+  .alias('pass', 'p')
+  .describe('pass', 'The password to commit to GitHub with')
+  .default('pass', settings.pass || undefined)
+  .string('organisation')
+  .alias('organisation', 'o')
+  .describe('organisation', 'The organisation the repositories belong under.')
+  .default('organisation', settings.organisation || undefined)
+  .string('team')
+  .alias('team', 't')
+  .describe('team', 'The team to be given commit access to newly created repos')
+  .default('team', settings.team || undefined)
+
+  .string('db')
+  .describe('db', 'The mongodb connection string to write metadata to')
+  .default('db', settings.db || undefined)
+
+  .string('age')
+  .alias('age', 'a')
+  .describe('age', 'The maximum age of messages to check')
+  .default('age', settings.age || undefined)
+  .demand('age');
+
 var args = optimist.argv;
 if (args.h || args.H || args['?'] || args.help) {
   console.warn();
@@ -70,7 +77,8 @@ if (args.save) {
     team: args.team,
     age: args.age,
     user: args.user,
-    pass: args.pass
+    pass: args.pass,
+    db: args.db
   }, null, 2));
   process.exit(0);
 }
@@ -80,10 +88,11 @@ if (args.clear) {
 }
 
 if (!args['dry-run']) {
-  optimist.demand('u')
-          .demand('p')
-          .demand('o')
-          .demand('t')
+  optimist.demand('user')
+          .demand('pass')
+          .demand('organisation')
+          .demand('team')
+          .demand('db')
           .argv;
 }
 
@@ -110,5 +119,4 @@ function normaliseDate(date) {
   return date.getFullYear() + '-' + month;
 }
 
-bot(args).pipe(jsonify())
-        .pipe(process.stdout);
+bot(args).pipe(jsonify()).pipe(process.stdout);
