@@ -29,7 +29,8 @@ Options:
 
 Usage:
 
-    $ pipermail-bot -h
+    $ pipermail-bot --help
+    $ pipermail-bot --user <USER> --pass <PASSWORD> --db <USER>:<PASSWORD>@ds031617.mongolab.com:31617/esdiscuss
 
 ## License
 
