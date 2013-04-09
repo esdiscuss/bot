@@ -23,7 +23,7 @@ function messages(options) {
 
   if (organisation) stream = stream.pipe(filters.notExists(organisation));
 
-  if (options.user && options.password && !dryRun) {
+  if (options.user && options.pass && !dryRun) {
     stream = stream
       .pipe(writeGitHub({
           user: {type: 'basic', username: options.user, password: options.pass},
