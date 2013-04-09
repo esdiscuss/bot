@@ -13,7 +13,7 @@ function messages(options) {
   var dryRun = options['dry-run'] || options.dryRun;
   var db = options.db || null;
 
-  var stream = pipermail(source, {progress: false, cache: true}).pipe(filters());
+  var stream = pipermail(source, {progress: options.progress || false, cache: options.cache !== false, gzip: options.gzip || false}).pipe(filters());
 
   if (age) stream = stream.pipe(filters.after(age));
 
