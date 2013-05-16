@@ -15,21 +15,33 @@ function messages(options) {
 
   var stream = pipermail(source, {progress: options.progress || false, cache: options.cache !== false, gzip: options.gzip || false}).pipe(filters());
 
-  if (age) stream = stream.pipe(filters.after(age));
+  if (age) {
+    stream.on('error', error);
+    stream = stream.pipe(filters.after(age));
+  }
 
   if (db && !dryRun) {
+    stream.on('error', error);
     stream = stream.pipe(writeMongo(db));
   }
 
-  if (organisation) stream = stream.pipe(filters.notExists(organisation));
+  if (organisation) {
+    stream.on('error', error);
+    stream = stream.pipe(filters.notExists(organisation));
+  }
 
   if (options.user && options.pass && !dryRun) {
+    stream.on('error', error);
     stream = stream
       .pipe(writeGitHub({
           user: {type: 'basic', username: options.user, password: options.pass},
           organisation: organisation,
           team: options.team
         }));
+  }
+
+  function error(err) {
+    stream.emit('error', err);
   }
 
   return stream;
