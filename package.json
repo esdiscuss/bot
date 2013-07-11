@@ -1,11 +1,12 @@
 {
   "name": "pipermail-bot",
-  "version": "1.2.6",
+  "version": "2.0.0-3",
   "description": "The esdiscuss bot",
   "main": "index.js",
   "bin": "bin/cmd.js",
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha -R spec",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -14,14 +15,13 @@
   "author": "ForbesLindesay",
   "license": "MIT",
   "dependencies": {
-    "q": "~0.9.2",
-    "pipermail": "~2.0.1",
-    "request": "~2.21.0",
-    "debug": "~0.7.2",
-    "github": "~0.1.8",
-    "optimist": "~0.4.0",
-    "ms": "~0.6.1",
+    "pipermail": "~2.0.2",
     "mongojs": "~0.7.3",
-    "once": "~1.1.1"
+    "slugg": "~0.1.2",
+    "barrage": "0.0.4"
+  },
+  "subdomain": "pipermail-bot",
+  "engines": {
+    "node": "0.8.x"
   }
 }
