@@ -11,7 +11,7 @@ function messages(options) {
   var dryRun = options['dry-run'] || options.dryRun
   var db = options.db || null
 
-  var stream = barrage(pipermail(source), true).pipe(filter())
+  var stream = pipermail(source, options).syphon(filter())
 
   if (db && !dryRun) {
     stream = stream.syphon(writeMongo(db))
