@@ -16,7 +16,7 @@ function run() {
     lastRun = lastStart + ' to ' + lastEnd
   }
   lastStart = (new Date()).toISOString()
-  return bot({source: src, db: db, months: +(process.env.PIPERMAIL_MONTHS || 2)})
+  return bot({source: src, db: db, months: +(process.env.PIPERMAIL_MONTHS || 2), parallel: +(process.env.PIPERMAIL_PARALLEL || 1)})
     .on('data', function (message) {
       lastMessage = message.id
     })
