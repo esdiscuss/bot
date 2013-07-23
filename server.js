@@ -37,7 +37,7 @@ http.createServer(function (req, res) {
   var status = 200;
   if (lastEnd === 'never finished') {
     status = 503
-  } else if (Date.now() - (new Date('2013-07-23T16:42:46.061Z')).getTime() > ms('1 hour')) {
+  } else if (Date.now() - (new Date(lastEnd)).getTime() > ms('1 hour')) {
     status = 503
   }
   res.writeHead(status, {'Content-Type': 'text/plain'})
