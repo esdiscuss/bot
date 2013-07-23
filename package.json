@@ -18,7 +18,8 @@
     "pipermail": "~2.1.1",
     "mongojs": "~0.7.3",
     "slugg": "~0.1.2",
-    "barrage": "0.0.4"
+    "barrage": "0.0.4",
+    "ms": "~0.6.1"
   },
   "subdomain": "pipermail-bot",
   "engines": {

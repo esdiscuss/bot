@@ -1,3 +1,4 @@
+var ms = require('ms')
 var bot = require('./index.js')
 
 var src = process.env.PIPERMAIL_SOURCE || 'https://mail.mozilla.org/pipermail/es-discuss/'
@@ -33,7 +34,13 @@ function maintain() {
 var http = require('http')
 
 http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'})
+  var status = 200;
+  if (lastEnd === 'never finished') {
+    status = 503
+  } else if (Date.now() - (new Date('2013-07-23T16:42:46.061Z')).getTime() > ms('1 hour')) {
+    status = 503
+  }
+  res.writeHead(status, {'Content-Type': 'text/plain'})
   res.end(settings + '\n\n' +
           'last-start:   ' + lastStart + '\n' +
           'last-end:     ' + lastEnd + '\n' +
