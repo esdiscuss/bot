@@ -41,11 +41,13 @@ http.createServer(function (req, res) {
     status = 503
   }
   res.writeHead(status, {'Content-Type': 'text/plain'})
-  res.end(settings + '\n\n' +
+  var warning = status === 503 ? 'WARNING: server behind on processing\n\n' : ''
+  res.end(warning + settings + '\n\n' +
           'last-start:   ' + lastStart + '\n' +
           'last-end:     ' + lastEnd + '\n' +
           'last-message: ' + lastMessage + '\n' +
-          'pervious-run: ' + lastRun)
+          'pervious-run: ' + lastRun + '\n\n' +
+          'current-time: ' + (new Date()).toISOString())
 }).listen(3000)
 
 console.log('Server running at http://localhost:3000/');
