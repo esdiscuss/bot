@@ -4,6 +4,8 @@ var bot = require('./index.js')
 var src = process.env.PIPERMAIL_SOURCE || 'https://mail.mozilla.org/pipermail/es-discuss/'
 var db = process.env.PIPERMAIL_DATABASE
 
+var didSomething = new Date()
+
 var settings = 'last-reboot:  ' + (new Date()).toISOString() + '\n' +
                'source:       ' + src + '\n' +
                'database:     ' + (db || 'no database attached').replace(/^.*@/,'')
@@ -20,9 +22,11 @@ function run() {
   return bot({source: src, db: db, months: +(process.env.PIPERMAIL_MONTHS || 2), parallel: +(process.env.PIPERMAIL_PARALLEL || 1)})
     .on('data', function (message) {
       lastMessage = message.id
+      didSomething = new Date()
     })
     .wait()
     .then(function () {
+      didSomething = new Date()
       lastEnd = (new Date()).toISOString()
     })
 }
@@ -48,6 +52,11 @@ http.createServer(function (req, res) {
           'last-message: ' + lastMessage + '\n' +
           'pervious-run: ' + lastRun + '\n\n' +
           'current-time: ' + (new Date()).toISOString())
+
+  if (Date.now() - didSomething.getTime() > ms('10 minutes')) {
+    console.log('It\'s been too long...rebooting.')
+    process.exit(1)
+  }
 }).listen(3000)
 
 console.log('Server running at http://localhost:3000/');
