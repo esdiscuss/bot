@@ -42,7 +42,7 @@ http.createServer(function (req, res) {
   var status = 200;
   if (lastEnd === 'never finished') {
     status = 503
-  } else if (Date.now() - (new Date(lastEnd)).getTime() > ms('1 hour')) {
+  } else if (Date.now() - (new Date(lastEnd)).getTime() > ms('30 minutes')) {
     status = 503
   }
   res.writeHead(status, {'Content-Type': 'text/plain'})
@@ -56,6 +56,11 @@ http.createServer(function (req, res) {
 
   if (Date.now() - didSomething.getTime() > ms('10 minutes')) {
     console.log('It\'s been too long...rebooting.')
+    process.exit(1)
+  }
+
+  if (lastEnd !== 'never finished' && Date.now() - (new Date(lastEnd)).getTime() > ms('1 hour')) {
+    console.log('It\'s been way too long...rebooting.')
     process.exit(1)
   }
 }).listen(3000)
