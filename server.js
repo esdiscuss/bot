@@ -3,6 +3,10 @@ var bot = require('./index.js')
 
 var src = process.env.PIPERMAIL_SOURCE || 'https://mail.mozilla.org/pipermail/es-discuss/'
 var db = process.env.PIPERMAIL_DATABASE
+var logConnection
+if (db) {
+  logConnection = mongojs(db, ['log'])
+}
 
 var didSomething = new Date()
 
@@ -29,6 +33,17 @@ function run() {
     .then(function () {
       didSomething = new Date()
       lastEnd = (new Date()).toISOString()
+      if (logConnection) {
+        logConnection.log.insert({
+          type: 'bot-run',
+          start: new Date(lastStart),
+          end: new Date(lastEnd)
+        }, {safe: true}, function (err) {
+          if (err) {
+            console.error(err.stack || err.message || err)
+          }
+        })
+      }
     })
 }
 maintain()
