@@ -1,4 +1,5 @@
 var ms = require('ms')
+var mongojs = require('mongojs')
 var bot = require('./index.js')
 
 var src = process.env.PIPERMAIL_SOURCE || 'https://mail.mozilla.org/pipermail/es-discuss/'
