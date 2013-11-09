@@ -25,6 +25,7 @@ function run() {
   }
   lastStart = (new Date()).toISOString()
   var defaultMonths = (new Date()).getDate() < 5 ? 2 : 1
+  didSomething = new Date()
   return bot({source: src, db: db, months: +(process.env.PIPERMAIL_MONTHS || defaultMonths), parallel: +(process.env.PIPERMAIL_PARALLEL || 1)})
     .on('data', function (message) {
       lastMessage = message.id
@@ -49,7 +50,9 @@ function run() {
 }
 maintain()
 function maintain() {
-  run().done(maintain, maintain)
+  run().done(function () {
+    setTimeout(maintain, 30 * 1000)
+  }, maintain)
 }
 
 var http = require('http')
@@ -75,7 +78,7 @@ http.createServer(function (req, res) {
     process.exit(1)
   }
 
-  if (lastEnd !== 'never finished' && Date.now() - (new Date(lastEnd)).getTime() > ms('1 hour')) {
+  if (lastEnd !== 'never finished' && Date.now() - (new Date(lastEnd)).getTime() > ms('30 minutes')) {
     console.log('It\'s been way too long...rebooting.')
     process.exit(1)
   }
