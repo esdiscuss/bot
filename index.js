@@ -1,5 +1,6 @@
 'use strict'
 
+var assert = require('assert')
 var pipermail = require('pipermail')
 var mongojs = require('mongojs')
 var Promise = require('promise')
@@ -14,7 +15,8 @@ function messages(options) {
   var db = options.db || null
 
   if (db) {
-    if (typeof db === 'string') db = mongojs(db, ['headers', 'contents', 'topics'])
+    assert(typeof db === 'string')
+    db = mongojs(db, ['headers', 'contents', 'topics'])
     options.filterMessage = function (url) {
       return new Promise(function (resolve, reject) {
         db.headers.findOne({url: url}, function (err, res) {
@@ -42,6 +44,18 @@ function messages(options) {
 
   if (db && !dryRun) {
     stream = stream.syphon(writeMongo(db))
+  }
+
+  var closed = false
+  function onEnd() {
+    if (closed) return
+    closed = true
+    db.close()
+  }
+  if (db) {
+    stream.on('end', onEnd)
+    stream.on('finish', onEnd)
+    stream.on('close', onEnd)
   }
 
   return stream;
