@@ -29,7 +29,6 @@ function messages(options) {
   }
 
   var stream = pipermail(source, options).filter(function (message) {
-    console.dir(message)
     //filter spam
     if (/spam/i.test(message.header.subject) || /no subject/i.test(message.header.subject)) {
       return false
