@@ -43,7 +43,7 @@ function messages(options) {
   })
 
   if (db && !dryRun) {
-    stream = stream.syphon(writeMongo(db))
+    stream = stream.syphon(writeMongo(db, options))
   }
 
   var closed = false
@@ -53,9 +53,7 @@ function messages(options) {
     db.close()
   }
   if (db) {
-    stream.on('end', onEnd)
-    stream.on('finish', onEnd)
-    stream.on('close', onEnd)
+    stream.once('end', onEnd)
   }
 
   return stream;
