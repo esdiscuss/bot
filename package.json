@@ -1,6 +1,6 @@
 {
   "name": "pipermail-bot",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "description": "The esdiscuss bot",
   "main": "index.js",
   "bin": "bin/cmd.js",
