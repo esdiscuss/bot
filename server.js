@@ -20,9 +20,6 @@ var lastEnd = 'never finished'
 var lastMessage = 'no messages processsed yet'
 
 function run() {
-  if (lastEnd != 'never finished') {
-    lastRun = lastStart + ' to ' + lastEnd
-  }
   lastStart = (new Date()).toISOString()
   var defaultMonths = (new Date()).getDate() < 5 ? 2 : 1
   didSomething = new Date()
@@ -51,6 +48,9 @@ function run() {
 maintain()
 function maintain() {
   run().done(function () {
+    if (lastEnd != 'never finished') {
+      lastRun = lastStart + ' to ' + lastEnd
+    }
     setTimeout(maintain, 30 * 1000)
   }, maintain)
 }
@@ -61,7 +61,7 @@ http.createServer(function (req, res) {
   var status = 200;
   if (lastEnd === 'never finished') {
     status = 503
-  } else if (Date.now() - (new Date(lastEnd)).getTime() > ms('30 minutes')) {
+  } else if (Date.now() - (new Date(lastEnd)).getTime() > ms('5 minutes')) {
     status = 503
   }
   res.writeHead(status, {'Content-Type': 'text/plain'})
@@ -73,15 +73,15 @@ http.createServer(function (req, res) {
           'pervious-run: ' + lastRun + '\n\n' +
           'current-time: ' + (new Date()).toISOString())
 
-  if (Date.now() - didSomething.getTime() > ms('10 minutes')) {
-    console.log('It\'s been too long...rebooting.')
-    process.exit(1)
-  }
-
-  if (lastEnd !== 'never finished' && Date.now() - (new Date(lastEnd)).getTime() > ms('30 minutes')) {
+  if ((lastEnd !== 'never finished' && timeSpan(lastEnd, '5 minutes')) || timeSpan(didSomething, '10 minutes')) {
     console.log('It\'s been way too long...rebooting.')
     process.exit(1)
   }
 }).listen(3000)
+function timeSpan(time, span) {
+  var now = new Date()
+  if (typeof time === 'string') time = new Date(time)
+  return now.getTime() - time.getTime() > ms(span.toString())
+}
 
 console.log('Server running at http://localhost:3000/');
