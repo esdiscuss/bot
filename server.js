@@ -4,9 +4,9 @@ var bot = require('./index.js')
 
 var src = process.env.PIPERMAIL_SOURCE || 'https://mail.mozilla.org/pipermail/es-discuss/'
 var db = process.env.PIPERMAIL_DATABASE
-var logConnection
+var connection
 if (db) {
-  logConnection = mongojs(db, ['log'])
+  connection = mongojs(db, ['log', 'headers', 'contents', 'topics'])
 }
 
 var didSomething = new Date()
@@ -23,7 +23,7 @@ function run() {
   lastStart = (new Date()).toISOString()
   var defaultMonths = (new Date()).getDate() < 5 ? 2 : 1
   didSomething = new Date()
-  return bot({source: src, db: db, months: +(process.env.PIPERMAIL_MONTHS || defaultMonths), parallel: +(process.env.PIPERMAIL_PARALLEL || 1)})
+  return bot({source: src, db: connection, months: +(process.env.PIPERMAIL_MONTHS || defaultMonths), parallel: +(process.env.PIPERMAIL_PARALLEL || 1)})
     .on('data', function (message) {
       lastMessage = message.id
       didSomething = new Date()
@@ -32,8 +32,8 @@ function run() {
     .then(function () {
       didSomething = new Date()
       lastEnd = (new Date()).toISOString()
-      if (logConnection) {
-        logConnection.log.insert({
+      if (connection) {
+        connection.log.insert({
           type: 'bot-run',
           start: new Date(lastStart),
           end: new Date(lastEnd)

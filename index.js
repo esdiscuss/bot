@@ -13,10 +13,10 @@ function messages(options) {
   source = source.replace(/([^\/])\/?$/g, '$1/')
   var dryRun = options['dry-run'] || options.dryRun
   var db = options.db || null
-
+  var dbAsString = typeof db === 'string';
   if (db) {
-    assert(typeof db === 'string')
-    db = mongojs(db, ['headers', 'contents', 'topics'])
+    if (dbAsString)
+      db = mongojs(db, ['headers', 'contents', 'topics'])
     options.filterMessage = function (url) {
       return new Promise(function (resolve, reject) {
         db.headers.findOne({url: url}, function (err, res) {
@@ -52,7 +52,7 @@ function messages(options) {
     closed = true
     db.close()
   }
-  if (db) {
+  if (dbAsString) {
     stream.once('end', onEnd)
   }
 
