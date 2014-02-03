@@ -17,7 +17,12 @@ function messages(options) {
   if (db) {
     if (dbAsString)
       db = mongojs(db, ['headers', 'contents', 'topics'])
+    options.filterMonth = function (url) {
+      console.dir(url)
+      return true
+    }
     options.filterMessage = function (url) {
+      console.dir(url)
       return new Promise(function (resolve, reject) {
         db.headers.findOne({url: url}, function (err, res) {
           if (err || res === null) return resolve(true)
