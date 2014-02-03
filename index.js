@@ -1,5 +1,6 @@
 'use strict'
 
+var util = require('util')
 var assert = require('assert')
 var pipermail = require('pipermail')
 var mongojs = require('mongojs')
@@ -24,9 +25,15 @@ function messages(options) {
     options.filterMessage = function (url) {
       return new Promise(function (resolve, reject) {
         db.headers.findOne({url: url}, function (err, res) {
-          if (err || res === null) return resolve(true)
+          if (err || res === null) {
+            console.log('header missing: ' + util.inspect(url))
+            return resolve(true)
+          }
           db.contents.findOne({_id: res._id}, function (err, res) {
-            if (err || res === null) return resolve(true)
+            if (err || res === null) {
+              console.log('body missing: ' + util.inspect(url))
+              return resolve(true)
+            }
             return resolve(false)
           })
         })
