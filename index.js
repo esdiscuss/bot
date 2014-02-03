@@ -22,7 +22,6 @@ function messages(options) {
       return true
     }
     options.filterMessage = function (url) {
-      console.dir(url)
       return new Promise(function (resolve, reject) {
         db.headers.findOne({url: url}, function (err, res) {
           if (err || res === null) return resolve(true)
