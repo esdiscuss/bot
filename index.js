@@ -23,11 +23,13 @@ function messages(options) {
         db.headers.findOne({url: url}, function (err, res) {
           if (err || res === null) {
             console.log('header missing: ' + util.inspect(url))
+            if (err) console.error(err.stack || err)
             return resolve(true)
           }
           db.contents.findOne({_id: res._id}, function (err, res) {
             if (err || res === null) {
               console.log('body missing: ' + util.inspect(url))
+              if (err) console.error(err.stack || err)
               return resolve(true)
             }
             return resolve(false)
