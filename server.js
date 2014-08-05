@@ -99,6 +99,6 @@ http.createServer(function (req, res) {
           'last-end:     ' + lastEnd + '\n' +
           'pervious-run: ' + lastRun + '\n\n' +
           'current-time: ' + (new Date()).toISOString());
-}).listen(3000);
+}).listen(process.env.PORT || 3000);
 
-console.log('Server running at http://localhost:3000/');
+console.log('Server running at http://localhost:' + (process.env.PORT || 3000));
