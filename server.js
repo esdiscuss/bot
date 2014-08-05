@@ -2,7 +2,8 @@
 
 var ms = require('ms');
 var mongojs = require('mongojs');
-  var raven = require('raven');
+var raven = require('raven');
+var readPipermail = require('./lib/read-pipermail.js');
 var bot = require('./index.js');
 
 if (!process.env.PIPERMAIL_SOURCE) {
@@ -84,7 +85,7 @@ http.createServer(function (req, res) {
   var status = 200;
   if (lastEnd === 'never finished') {
     status = 503
-  } else if (Date.now() - (new Date(lastEnd)).getTime() > ms('5 minutes')) {
+  } else if (Date.now() - (new Date(lastEnd)).getTime() > ms('20 minutes')) {
     status = 503
     onError('Timeout triggering restart');
     setTimeout(function () {
@@ -94,12 +95,13 @@ http.createServer(function (req, res) {
   }
   res.writeHead(status, {'Content-Type': 'text/plain'})
   var warning = status === 503 ? 'WARNING: server behind on processing\n\n' : ''
-  var currentRun = ms(Date.now() - new Date(lastStart).getTime())
+  var currentRun = lastStart > lastEnd ? ms(Date.now() - new Date(lastStart).getTime()) : '-'
   res.end(warning + settings + '\n\n' +
           'last-start:   ' + lastStart + '\n' +
           'last-end:     ' + lastEnd + '\n' +
-          'pervious-run: ' + lastRun + '\n\n' +
-          'current-run:  ' + currentRun + '\n\n' +
+          'pervious-run: ' + lastRun + '\n' +
+          'current-run:  ' + currentRun + '\n' +
+          'status:       ' + readPipermail.getStatus() + '\n\n' +
           'current-time: ' + (new Date()).toISOString());
 }).listen(process.env.PORT || 3000);
 
