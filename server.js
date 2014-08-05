@@ -94,10 +94,12 @@ http.createServer(function (req, res) {
   }
   res.writeHead(status, {'Content-Type': 'text/plain'})
   var warning = status === 503 ? 'WARNING: server behind on processing\n\n' : ''
+  var currentRun = ms(Date.now() - new Date(lastStart).getTime())
   res.end(warning + settings + '\n\n' +
           'last-start:   ' + lastStart + '\n' +
           'last-end:     ' + lastEnd + '\n' +
           'pervious-run: ' + lastRun + '\n\n' +
+          'current-run:  ' + currentRun + '\n\n' +
           'current-time: ' + (new Date()).toISOString());
 }).listen(process.env.PORT || 3000);
 
