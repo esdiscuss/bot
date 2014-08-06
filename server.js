@@ -28,7 +28,10 @@ var ravenClient = process.env.PIPERMAIL_RAVEN ?
     new raven.Client(process.env.PIPERMAIL_RAVEN) :
     null;
 if (ravenClient) {
-  ravenClient.patchGlobal();
+  ravenClient.patchGlobal(function (logged, err) {
+    console.error(err.stack || err);
+    process.exit(1);
+  });
 }
 function onError(err) {
   console.error(err.stack || err.message || err);
