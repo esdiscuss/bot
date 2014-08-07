@@ -75,10 +75,10 @@ function maintain() {
     if (lastEnd != 'never finished') {
       lastRun = ms(new Date(lastEnd).getTime() - new Date(lastStart).getTime());
     }
-    setTimeout(maintain, ms('10s'));
+    setTimeout(maintain, ms('60s'));
   }, function (err) {
     onError(err);
-    setTimeout(maintain, ms('10s'));
+    setTimeout(maintain, ms('60s'));
   })
 }
 
