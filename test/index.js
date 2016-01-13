@@ -1,0 +1,1 @@
+console.log('This project does not have tests');
