@@ -1,7 +1,7 @@
 # pipermail-bot
 
-[![Build Status](https://img.shields.io/travis/esdicuss/bot/master.svg)](https://travis-ci.org/esdicuss/bot)
-[![Dependency Status](https://img.shields.io/david/esdicuss/bot.svg)](https://david-dm.org/esdicuss/bot)
+[![Build Status](https://img.shields.io/travis/esdiscuss/bot/master.svg)](https://travis-ci.org/esdiscuss/bot)
+[![Dependency Status](https://img.shields.io/david/esdiscuss/bot.svg)](https://david-dm.org/esdiscuss/bot)
 [![Heroku Deployment](https://img.shields.io/badge/deployment-heroku-green.svg)](https://dashboard.heroku.com/apps/esdiscuss-bot)
 [![Heroku Deployment](https://img.shields.io/badge/deployment-heroku-green.svg)](https://dashboard.heroku.com/apps/esdiscuss-bot)
 
