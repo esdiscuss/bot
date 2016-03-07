@@ -7,7 +7,7 @@
   "scripts": {
     "test": "node test",
     "start": "node server.js",
-    "deploy": "npm i heroku-deploy && heroku-deploy --app esdiscuss-bot"
+    "deploy": "npm i heroku-release && heroku-release --app esdiscuss-bot"
   },
   "repository": {
     "type": "git",
