@@ -6,7 +6,8 @@
   "bin": "bin/cmd.js",
   "scripts": {
     "test": "node test",
-    "start": "node server.js"
+    "start": "node server.js",
+    "deploy": "npm i heroku-deploy && heroku-deploy --app esdiscuss-bot"
   },
   "repository": {
     "type": "git",

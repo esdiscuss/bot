@@ -7,7 +7,7 @@ node_js:
 
 deploy:
   provider: script
-  script: npm i heroku-deploy -g && heroku-deploy --app esdiscuss-bot
+  script: npm run deploy
   on:
     branch: master
     node_js: 5.7.1
