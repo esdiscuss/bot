@@ -1,0 +1,17 @@
+language: node_js
+
+node_js:
+  - "5.7.1"
+services:
+  - mongodb
+env:
+  - MONGO_DB="mongodb://localhost/tempjs"
+before_script:
+  - sleep 15
+
+deploy:
+  provider: script
+  script: npm i heroku-deploy -g && heroku-deploy --app esdiscuss-bot
+  on:
+    branch: master
+    node_js: 5.7.1
