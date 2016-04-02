@@ -14,7 +14,7 @@ if (!process.env.PIPERMAIL_DATABASE) {
 }
 
 var src = process.env.PIPERMAIL_SOURCE;
-var db = mongojs(process.env.PIPERMAIL_DATABASE, ['log', 'headers', 'contents', 'topics']);
+var db = mongojs(process.env.PIPERMAIL_DATABASE, ['log', 'headers', 'contents', 'topics', 'runsPerDay']);
 
 
 var settings = 'last-reboot:  ' + (new Date()).toISOString() + '\n' +
@@ -66,6 +66,18 @@ function run() {
           onError(err)
         }
       })
+      var now = new Date();
+      var day = now.toISOString().split('T')[0];
+      db.runsPerDay.update(
+        {_id: day},
+        {$inc: { runs: 1, totalDuration: (new Date(lastEnd) - new Date(lastStart)) }},
+        {upsert: true},
+        function (err) {
+          if (err) {
+            onError(err)
+          }
+        }
+      )
     }
   });
 }
