@@ -22,7 +22,7 @@
     "barrage": "1.1.0",
     "ms": "~0.7.1",
     "promise": "~7.1.1",
-    "raven": "~1.1.0"
+    "raven": "~1.2.0"
   },
   "host": "bot.esdiscuss.org",
   "engines": {
