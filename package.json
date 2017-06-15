@@ -26,6 +26,6 @@
   },
   "host": "bot.esdiscuss.org",
   "engines": {
-    "node": "8.1.1"
+    "node": "8.1.2"
   }
 }
