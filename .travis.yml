@@ -7,8 +7,7 @@ node_js:
 services:
   - mongodb
 env:
-  - PIPERMAIL_DATABASE="mongodb://localhost/tempjs"
-  - PIPERMAIL_SOURCE="https://mail.mozilla.org/pipermail/es-discuss/"
+  - PIPERMAIL_DATABASE="mongodb://localhost/tempjs" PIPERMAIL_SOURCE="https://mail.mozilla.org/pipermail/es-discuss/"
 before_script:
   - sleep 15
 
