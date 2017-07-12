@@ -96,7 +96,7 @@ function maintain() {
 
 var http = require('http')
 
-http.createServer(function (req, res) {
+module.exports = http.createServer(function (req, res) {
   var status = 200;
   if (lastEnd === 'never finished') {
     status = 503

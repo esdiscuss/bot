@@ -5,9 +5,12 @@
   "main": "index.js",
   "bin": "bin/cmd.js",
   "scripts": {
-    "test": "node test",
+    "test": "node test local",
     "start": "node server.js",
-    "deploy": "npm i heroku-release && heroku-release --app esdiscuss-bot-staging"
+    "predeploy": "npm i heroku-release",
+    "deploy": "npm run deploy:staging && npm run deploy:promote",
+    "deploy:staging": "heroku-release publish --app esdiscuss-bot-staging && node test staging",
+    "deploy:promote": "heroku-release promote -p esdiscuss-bot -s esdiscuss-bot-staging -t esdiscuss-bot && node test prod"
   },
   "repository": {
     "type": "git",
@@ -27,5 +30,9 @@
   "host": "bot.esdiscuss.org",
   "engines": {
     "node": "8.1.4"
+  },
+  "devDependencies": {
+    "dotenv": "^4.0.0",
+    "then-request": "^3.2.0"
   }
 }

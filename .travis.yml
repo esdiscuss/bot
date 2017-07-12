@@ -4,6 +4,13 @@ sudo: false
 
 node_js:
   - "8.1.4"
+services:
+  - mongodb
+env:
+  - PIPERMAIL_DATABASE="mongodb://localhost/tempjs"
+  - PIPERMAIL_SOURCE="https://mail.mozilla.org/pipermail/es-discuss/"
+before_script:
+  - sleep 15
 
 deploy:
   provider: script
