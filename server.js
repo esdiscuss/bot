@@ -83,7 +83,7 @@ function run() {
 }
 maintain()
 function maintain() {
-  run().done(function () {
+  run().then(function () {
     if (lastEnd != 'never finished') {
       lastRun = ms(new Date(lastEnd).getTime() - new Date(lastStart).getTime());
     }
@@ -91,7 +91,11 @@ function maintain() {
   }, function (err) {
     onError(err);
     setTimeout(maintain, ms('60s'));
-  })
+  }).catch(function (ex) {
+    setTimeout(function () {
+      throw ex;
+    }, 0);
+  });
 }
 
 var http = require('http')
