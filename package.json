@@ -19,7 +19,7 @@
   "author": "ForbesLindesay",
   "license": "MIT",
   "dependencies": {
-    "pipermail": "~3.1.1",
+    "pipermail": "~5.0.0",
     "mongojs": "~2.4.0",
     "slugg": "~1.2.0",
     "barrage": "2.0.0",
