@@ -22,10 +22,14 @@ switch (process.argv[2]) {
     break;
 }
 
-const timeout = Date.now() + 10 * 60 * 1000;
+const slow = Date.now() + 60 * 1000;
+const timeout = Date.now() + 5 * 60 * 1000;
 function poll() {
   request('GET', url).done(res => {
     if (res.statusCode === 503 && Date.now() < timeout) {
+      if (Date.now() > slow) {
+        console.log(res.body.toString('utf8'));
+      }
       return poll();
     }
     if (res.statusCode !== 200) {
