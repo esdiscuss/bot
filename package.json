@@ -5,12 +5,15 @@
   "main": "index.js",
   "bin": "bin/cmd.js",
   "scripts": {
-    "test": "node test local",
+    "test": "npm run build && node lib/test local",
     "start": "node server.js",
-    "predeploy": "npm i heroku-release",
+    "build": "tsc",
+    "predeploy": "npm run build && npm i heroku-release",
     "deploy": "npm run deploy:staging && npm run deploy:promote",
-    "deploy:staging": "heroku-release publish --app esdiscuss-bot-staging && node test staging",
-    "deploy:promote": "heroku-release promote -p esdiscuss-bot -s esdiscuss-bot-staging -t esdiscuss-bot && node test prod"
+    "deploy:staging":
+      "heroku-release publish --app esdiscuss-bot-staging && node test staging",
+    "deploy:promote":
+      "heroku-release promote -p esdiscuss-bot -s esdiscuss-bot-staging -t esdiscuss-bot && node test prod"
   },
   "repository": {
     "type": "git",
@@ -19,13 +22,16 @@
   "author": "ForbesLindesay",
   "license": "MIT",
   "dependencies": {
-    "pipermail": "~5.0.0",
-    "mongojs": "~2.4.0",
-    "slugg": "~1.2.0",
-    "barrage": "2.0.2",
+    "@types/ms": "^0.7.30",
+    "@types/node": "^8.0.43",
+    "@types/raven": "^2.1.2",
+    "barrage": "2.0.4",
     "ms": "~2.0.0",
-    "promise": "~8.0.0",
-    "raven": "~2.2.0"
+    "pipermail": "^5.0.1",
+    "promise": "^8.0.1",
+    "raven": "~2.2.0",
+    "slugg": "~1.2.0",
+    "then-mongo": "^3.0.2"
   },
   "host": "bot.esdiscuss.org",
   "engines": {
@@ -33,6 +39,7 @@
   },
   "devDependencies": {
     "dotenv": "^4.0.0",
-    "then-request": "^4.0.0"
+    "then-request": "^4.0.0",
+    "typescript": "^2.5.3"
   }
 }

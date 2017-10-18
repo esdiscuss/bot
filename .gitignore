@@ -16,3 +16,5 @@ npm-debug.log
 node_modules
 environment.toml
 .env
+package-lock.json
+lib/
