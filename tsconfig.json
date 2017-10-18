@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "lib": ["es2017"],
     "outDir": "lib",

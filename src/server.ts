@@ -2,7 +2,7 @@ import {Server} from 'net';
 import {createServer} from 'http';
 import {Client} from 'raven';
 import ms = require('ms');
-import Database from './Database';
+import Database from './database';
 import {getStatus} from './read-pipermail';
 import runBot from './';
 
