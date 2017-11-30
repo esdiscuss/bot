@@ -26,7 +26,7 @@
     "@types/node": "^8.0.43",
     "@types/raven": "^2.1.2",
     "barrage": "2.0.4",
-    "ms": "~2.0.0",
+    "ms": "~2.1.0",
     "pipermail": "^5.0.1",
     "promise": "^8.0.1",
     "raven": "~2.2.0",
