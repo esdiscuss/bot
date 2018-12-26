@@ -35,7 +35,7 @@
   },
   "host": "bot.esdiscuss.org",
   "engines": {
-    "node": "10.10.0"
+    "node": "11.6.0"
   },
   "devDependencies": {
     "dotenv": "^6.0.0",
