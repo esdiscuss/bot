@@ -38,7 +38,7 @@
     "node": "11.14.0"
   },
   "devDependencies": {
-    "dotenv": "^6.0.0",
+    "dotenv": "^8.0.0",
     "then-request": "^6.0.0",
     "typescript": "^2.5.3"
   }
