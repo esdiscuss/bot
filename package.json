@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/ms": "^0.7.30",
-    "@types/node": "^10.0.3",
+    "@types/node": "^13.5.3",
     "@types/raven": "^2.1.2",
     "barrage": "2.0.4",
     "ms": "~2.1.0",
