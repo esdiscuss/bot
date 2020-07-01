@@ -19,6 +19,7 @@ export default [
     namespace: 'esdiscuss',
     data: {
       NODE_ENV: 'production',
+      PIPERMAIL_SOURCE: 'https://mail.mozilla.org/pipermail/es-discuss/',
     },
   }),
 ];

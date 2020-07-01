@@ -6,9 +6,7 @@ import createSecret from './createSecrets';
 //   - delete `secrets.ts`
 // The code for `secrets.ts` is in 1password
 interface Secrets {
-  MONGO_USER: string;
-  MONGO_PASS: string;
-
+  PIPERMAIL_MONGO_DB: string;
   DATABASE_URL: string;
 }
 export default function secrets(production: Secrets) {
