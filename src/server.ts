@@ -15,11 +15,11 @@ function validateEnvVariable(name: string): string {
 }
 const PIPERMAIL_SOURCE = validateEnvVariable('PIPERMAIL_SOURCE');
 
-const PIPERMAIL_DATABASE = validateEnvVariable('PIPERMAIL_DATABASE');
+const PIPERMAIL_MONGO_DB = validateEnvVariable('PIPERMAIL_MONGO_DB');
 
 const PIPERMAIL_RAVEN = process.env.PIPERMAIL_RAVEN;
 
-const db = new Database(PIPERMAIL_DATABASE);
+const db = new Database(PIPERMAIL_MONGO_DB);
 
 const settings =
   'last-reboot:  ' +
@@ -29,7 +29,7 @@ const settings =
   PIPERMAIL_SOURCE +
   '\n' +
   'database:     ' +
-  PIPERMAIL_DATABASE.replace(/^.*@/, '');
+  PIPERMAIL_MONGO_DB.replace(/^.*@/, '');
 let lastRun = 'no old runs to display';
 let lastStart = 'never started';
 let lastEnd = 'never finished';
@@ -61,7 +61,7 @@ function run() {
     months: +defaultMonths,
     parallel: +parallel,
     onError: onError,
-  }).then(function() {
+  }).then(function () {
     lastEnd = new Date().toISOString();
     db.logRun(new Date(lastStart), new Date(lastEnd)).done(null, onError);
   });
@@ -91,7 +91,7 @@ const server: Server = createServer((req, res) => {
   } else if (Date.now() - new Date(lastEnd).getTime() > ms('20 minutes')) {
     status = 503;
     onError(new Error('Timeout triggering restart'));
-    setTimeout(function() {
+    setTimeout(function () {
       // allow time for the error to be logged
       process.exit(1);
     }, 500);

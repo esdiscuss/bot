@@ -11,8 +11,6 @@ function getConfig(): {url: string; server: null | Server} {
         url: 'http://localhost:3000',
         server: require('./server').default,
       };
-    case 'staging':
-      return {url: 'https://esdiscuss-bot-staging.herokuapp.com', server: null};
     case 'prod':
       return {url: 'https://bot.esdiscuss.org', server: null};
     default:
@@ -24,7 +22,7 @@ const {server, url} = getConfig();
 const timeout = Date.now() + 5 * 60 * 1000;
 let slow = Date.now() + 1 * 60 * 1000;
 function poll() {
-  request('GET', url).done(res => {
+  request('GET', url).done((res) => {
     if (res.statusCode === 503 && Date.now() < timeout) {
       if (Date.now() > slow) {
         console.log('status: ' + res.statusCode);
