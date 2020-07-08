@@ -76,7 +76,7 @@ const server: Server = createServer((req, res) => {
     warning +
       `last-reboot:  ${lastReboot}\n` +
       `source:       ${PIPERMAIL_SOURCE}\n` +
-      `months:       ${monthsToProcess}\n` +
+      `months:       ${monthsToProcess()}\n` +
       `parallelism:  ${numberOfMessagesToProcessInParallel}\n` +
       '\n\n' +
       `last-start:   ${lastStart}\n` +
