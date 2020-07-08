@@ -1,22 +1,23 @@
-import connect, {
-  Database as DatabaseConnection,
-  Collection,
-  Cursor,
-} from 'then-mongo';
-import {Header} from 'pipermail';
-import Promise = require('promise');
-const slug: (str: string) => string = require('slugg');
+import {Connection, sql} from '@databases/pg';
 
-export interface dbHeader extends Header {
-  _id: string;
-  subjectID: string;
-  url: string;
+export interface DbMessage {
+  id: number;
+  topic_id: number;
+  from_email: string;
+  from_name: string;
+  reply: string; // <- URL
+  sent_at: Date;
+  original_content: string;
+  source_url: string; // <- URL
+  message_key: string;
+  // edited_content: string | null; <- not used by bot
+  // edited_at: Date | null; <- not used by bot
 }
-
-export interface dbContent {
-  _id: string;
-  subjectID: string;
-  content: string;
+export interface DbTopic {
+  id: number;
+  topic_name: string;
+  topic_slug: string;
+  topic_key: string;
 }
 
 export interface dbTopic {
@@ -39,107 +40,70 @@ export interface dbTopic {
 }
 
 export default class Database {
-  private headers: Collection;
-  private contents: Collection;
-  private topics: Collection;
-  private log: Collection;
-  private runsPerDay: Collection;
-  constructor(str: string) {
-    const db = connect(str);
-    this.headers = db.collection('headers');
-    this.contents = db.collection('contents');
-    this.topics = db.collection('topics');
-    this.log = db.collection('log');
-    this.runsPerDay = db.collection('runsPerDay');
+  private db: Connection;
+  constructor(db: Connection) {
+    this.db = db;
   }
-  getHeaderByUrl(url: string): Promise<dbHeader> {
-    return this.headers.findOne({url: url}) as any;
+  async tx<T>(fn: (tx: Database) => Promise<T>): Promise<T> {
+    return await this.db.tx((tx) => fn(new Database(tx)));
   }
-  hasContent(id: string): Promise<boolean> {
-    return this.headers
-      .find({_id: id})
-      .count()
-      .then(result => !!result);
-  }
-  addHeader(header: dbHeader): Promise<void> {
-    return this.headers.insert(header, {safe: true}).then<void, void>(
-      () => {},
-      err => {
-        if (err.code != 11000) {
-          //if not "document already exists"
-          throw err;
-        }
-      },
-    );
-  }
-  addContent(content: dbContent): Promise<void> {
-    return this.contents.insert(content, {safe: true}).then<void, void>(
-      () => {},
-      err => {
-        if (err.code != 11000) {
-          //if not "document already exists"
-          throw err;
-        }
-      },
-    );
-  }
-  getTopics(startMonth?: Date): Promise<dbTopic[]> {
-    // TODO a few to many "any" keywords in this one
-    const sort = {$sort: {date: 1}};
-    const group = {
-      $group: {
-        _id: '$subjectID',
-        subject: {$first: '$subject'},
-        messages: {$sum: 1},
-        first: {$first: '$from'},
-        last: {$last: '$from'},
-        start: {$first: '$date'},
-        end: {$last: '$date'},
-      },
-    };
-    const cursor: Cursor = startMonth
-      ? (this.headers.aggregate as any)(sort, group, {
-          $match: {end: {$gt: startMonth}},
-        })
-      : (this.headers.aggregate as any)(sort, group);
-    return cursor.toArray().then(objects =>
-      objects.map((obj): dbTopic => {
-        return {
-          ...(obj as any),
-          subjectID: (obj as any)._id,
-          _id: slug((obj as any).subject),
-        };
-      }),
-    );
-  }
-  updateTopic(topic: dbTopic): Promise<void> {
-    return this.topics
-      .update({_id: topic._id}, topic, {upsert: true})
-      .then(() => {});
+  async hasMessage(url: string): Promise<boolean> {
+    const [{count}] = await this.db.query(sql`
+      SELECT
+        count(*) AS count
+      FROM
+        messages
+      WHERE
+        source_url = ${url};
+    `);
+    return count !== 0;
   }
 
-  logRun(start: Date, end: Date): Promise<void> {
+  async insertMessage(m: Omit<DbMessage, 'id'>) {
+    await this.db.query(sql`
+      INSERT INTO messages (topic_id, from_email, from_name, reply, sent_at, original_content, source_url, message_key)
+		    VALUES(${m.topic_id}, ${m.from_email}, ${m.from_name}, ${m.reply}, ${m.sent_at}, ${m.original_content}, ${m.source_url}, ${m.message_key})
+    `);
+  }
+
+  async getTopicByKey(key: string): Promise<DbTopic | undefined> {
+    const [topic] = await this.db.query(sql`
+      SELECT
+        id,
+        topic_name,
+        topic_slug,
+        topic_key
+      FROM
+        topics
+      WHERE
+        topic_key = ${key};
+    `);
+    return topic;
+  }
+
+  async insertTopic(t: Omit<DbTopic, 'id'>): Promise<DbTopic> {
+    const [topicWithID] = await this.db.query(sql`
+      INSERT INTO topics (topic_name, topic_slug, topic_key)
+        VALUES (${t.topic_name}, ${t.topic_slug}, ${t.topic_key})
+        ON CONFLICT (topic_key)
+        DO UPDATE SET
+          topic_key = EXCLUDED.topic_key
+        RETURNING
+          id,
+          topic_name,
+          topic_slug,
+          topic_key;
+    `);
+    return topicWithID;
+  }
+
+  async logRun(): Promise<void> {
     var now = new Date();
     var day = now.toISOString().split('T')[0];
-    return Promise.all([
-      this.log.insert(
-        {
-          type: 'bot-run',
-          start,
-          end,
-        },
-        {safe: true},
-      ),
-      this.runsPerDay.update(
-        {_id: day},
-        {
-          $inc: {
-            runs: 1,
-            totalDuration: start.getTime() - end.getTime(),
-          },
-        },
-        {upsert: true},
-      ),
-    ]).then(() => {});
+    await this.db.query(sql`
+      INSERT INTO bot_runs_per_day (id, runs_count)
+        VALUES (${day}, 1)
+        ON CONFLICT (id) DO UPDATE SET runs_count = bot_runs_per_day.runs_count + 1;
+    `);
   }
 }

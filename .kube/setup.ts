@@ -20,6 +20,8 @@ export default [
     data: {
       NODE_ENV: 'production',
       PIPERMAIL_SOURCE: 'https://mail.mozilla.org/pipermail/es-discuss/',
+      PIPERMAIL_MONTHS: '4',
+      PIPERMAIL_PARALLEL: '10',
     },
   }),
 ];

@@ -1,74 +1,45 @@
 import {Server} from 'net';
 import {createServer} from 'http';
-import {Client} from 'raven';
 import ms = require('ms');
 import Database from './database';
 import {getStatus} from './read-pipermail';
 import runBot from './';
+import {
+  monthsToProcess,
+  numberOfMessagesToProcessInParallel,
+  PIPERMAIL_SOURCE,
+  SECRET_DATABASE_URL,
+} from './config';
+import createConnection from '@databases/pg';
 
-function validateEnvVariable(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error('You must specify the "' + name + '" environment variable');
-  }
-  return value;
-}
-const PIPERMAIL_SOURCE = validateEnvVariable('PIPERMAIL_SOURCE');
+const db = new Database(createConnection(SECRET_DATABASE_URL));
 
-const PIPERMAIL_MONGO_DB = validateEnvVariable('PIPERMAIL_MONGO_DB');
-
-const PIPERMAIL_RAVEN = process.env.PIPERMAIL_RAVEN;
-
-const db = new Database(PIPERMAIL_MONGO_DB);
-
-const settings =
-  'last-reboot:  ' +
-  new Date().toISOString() +
-  '\n' +
-  'source:       ' +
-  PIPERMAIL_SOURCE +
-  '\n' +
-  'database:     ' +
-  PIPERMAIL_MONGO_DB.replace(/^.*@/, '');
+const lastReboot = new Date().toISOString();
 let lastRun = 'no old runs to display';
 let lastStart = 'never started';
 let lastEnd = 'never finished';
 
-const ravenClient = PIPERMAIL_RAVEN ? new Client(PIPERMAIL_RAVEN) : null;
-if (ravenClient) {
-  ravenClient.install();
-}
 function onError(err: Error) {
   console.error(err.stack || err.message || err);
-  if (ravenClient) {
-    if (typeof err === 'string') {
-      ravenClient.captureMessage(err);
-    } else {
-      ravenClient.captureException(err);
-    }
-  }
 }
 
-function run() {
+async function run() {
   lastStart = new Date().toISOString();
-  const defaultMonths =
-    process.env.PIPERMAIL_MONTHS || (new Date().getDate() < 5 ? 2 : 1);
 
-  const parallel = process.env.PIPERMAIL_PARALLEL || 1;
-  return runBot({
+  await runBot({
     source: PIPERMAIL_SOURCE,
     db: db,
-    months: +defaultMonths,
-    parallel: +parallel,
+    months: monthsToProcess(),
+    parallel: numberOfMessagesToProcessInParallel,
     onError: onError,
-  }).then(function () {
-    lastEnd = new Date().toISOString();
-    db.logRun(new Date(lastStart), new Date(lastEnd)).done(null, onError);
   });
+
+  lastEnd = new Date().toISOString();
+  db.logRun().catch(onError);
 }
 maintain();
 function maintain() {
-  run().done(
+  run().then(
     () => {
       if (lastEnd != 'never finished') {
         lastRun = ms(
@@ -103,25 +74,17 @@ const server: Server = createServer((req, res) => {
     lastStart > lastEnd ? ms(Date.now() - new Date(lastStart).getTime()) : '-';
   res.end(
     warning +
-      settings +
+      `last-reboot:  ${lastReboot}\n` +
+      `source:       ${PIPERMAIL_SOURCE}\n` +
+      `months:       ${monthsToProcess}\n` +
+      `parallelism:  ${numberOfMessagesToProcessInParallel}\n` +
       '\n\n' +
-      'last-start:   ' +
-      lastStart +
-      '\n' +
-      'last-end:     ' +
-      lastEnd +
-      '\n' +
-      'pervious-run: ' +
-      lastRun +
-      '\n' +
-      'current-run:  ' +
-      currentRun +
-      '\n' +
-      'status:       ' +
-      getStatus() +
-      '\n\n' +
-      'current-time: ' +
-      new Date().toISOString(),
+      `last-start:   ${lastStart}\n` +
+      `last-end:     ${lastEnd}\n` +
+      `pervious-run: ${lastRun}\n` +
+      `current-run:  ${currentRun}\n` +
+      `status:       ${getStatus()}\n\n` +
+      `current-time: ${new Date().toISOString()}`,
   );
 }).listen(process.env.PORT || 3000, () => {
   console.log(

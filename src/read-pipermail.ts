@@ -1,6 +1,5 @@
 import assert = require('assert');
 import pipermail, {Message, ReadableStream} from 'pipermail';
-import Promise = require('promise');
 import Database from './database';
 
 let status = '';
@@ -16,30 +15,17 @@ export interface Options {
   onError(err: Error): any;
 }
 
-export default function messages(options: Options) {
+export default function messages(options: Options): ReadableStream<Message> {
   const source = options.source.replace(/([^\/])\/?$/g, '$1/');
   const db = options.db;
 
   return pipermail(source, {
     parallel: options.parallel,
     months: options.months,
-    filterMessage(url: string): PromiseLike<boolean> {
-      var start = Date.now();
-      return db
-        .getHeaderByUrl(url)
-        .then(header => {
-          if (!header) {
-            return true;
-          }
-          return db.hasContent(header._id).then(hasContent => !hasContent);
-        })
-        .then(function(result) {
-          var end = Date.now();
-          status = url + ' ' + (end - start) + 'ms ' + JSON.stringify(result);
-          return result;
-        });
+    async filterMessage(url: string) {
+      return await db.hasMessage(url);
     },
-  }).filter(function(message) {
+  }).filter(function (message) {
     //filter spam
     if (
       /spam/i.test(message.header.subject) ||

@@ -17,14 +17,13 @@
   "author": "ForbesLindesay",
   "license": "MIT",
   "dependencies": {
+    "@databases/pg": "^2.1.2",
     "@types/ms": "^0.7.30",
     "@types/node": "^10.0.3",
-    "@types/raven": "^2.1.2",
     "barrage": "2.0.4",
     "ms": "~2.1.0",
     "pipermail": "^5.0.1",
     "promise": "^8.0.1",
-    "raven": "^2.5.0",
     "slugg": "~1.2.0",
     "then-mongo": "^3.0.2"
   },
