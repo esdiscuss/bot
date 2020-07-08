@@ -56,10 +56,12 @@ export default class Database {
       WHERE
         source_url = ${url};
     `);
+    console.log(`hasMessage(${url}) => ${count}`);
     return count !== 0;
   }
 
   async insertMessage(m: Omit<DbMessage, 'id'>) {
+    console.log(`insertMessage(${m.source_url})`);
     await this.db.query(sql`
       INSERT INTO messages (topic_id, from_email, from_name, reply, sent_at, original_content, source_url, message_key)
 		    VALUES(${m.topic_id}, ${m.from_email}, ${m.from_name}, ${m.reply}, ${m.sent_at}, ${m.original_content}, ${m.source_url}, ${m.message_key})
@@ -78,10 +80,12 @@ export default class Database {
       WHERE
         topic_key = ${key};
     `);
+    console.log(`getTopicByKey(${key}) => ${topic?.slug}`);
     return topic;
   }
 
   async insertTopic(t: Omit<DbTopic, 'id'>): Promise<DbTopic> {
+    console.log(`insertTopic(${t.topic_slug})`);
     const [topicWithID] = await this.db.query(sql`
       INSERT INTO topics (topic_name, topic_slug, topic_key)
         VALUES (${t.topic_name}, ${t.topic_slug}, ${t.topic_key})
