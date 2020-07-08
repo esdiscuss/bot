@@ -9,8 +9,10 @@ import {
   numberOfMessagesToProcessInParallel,
   PIPERMAIL_SOURCE,
   SECRET_DATABASE_URL,
+  PORT,
 } from './config';
 import createConnection from '@databases/pg';
+import log from './logger';
 
 const db = new Database(createConnection(SECRET_DATABASE_URL));
 
@@ -35,6 +37,14 @@ async function run() {
   });
 
   lastEnd = new Date().toISOString();
+
+  const duration = new Date(lastEnd).getTime() - new Date(lastStart).getTime();
+  log({
+    event_status: 'ok',
+    event_type: 'run_completed',
+    message: `Run completed - ${ms(duration)}`,
+    duration,
+  });
   db.logRun().catch(onError);
 }
 maintain();
@@ -86,10 +96,13 @@ const server: Server = createServer((req, res) => {
       `status:       ${getStatus()}\n\n` +
       `current-time: ${new Date().toISOString()}`,
   );
-}).listen(process.env.PORT || 3000, () => {
-  console.log(
-    'Server running at http://localhost:' + (process.env.PORT || 3000),
-  );
+}).listen(PORT, () => {
+  log({
+    event_status: 'ok',
+    event_type: 'server_listening',
+    message: `Server running at http://localhost:${PORT}`,
+    port: PORT,
+  });
 });
 
 export default server;

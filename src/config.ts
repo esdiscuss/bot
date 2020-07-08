@@ -2,6 +2,8 @@ export const SECRET_DATABASE_URL = validateEnvVariable('DATABASE_URL');
 
 export const PIPERMAIL_SOURCE = validateEnvVariable('PIPERMAIL_SOURCE');
 
+export const PORT = validateInteger('PORT', 3000);
+
 export const numberOfMessagesToProcessInParallel = validateInteger(
   'PIPERMAIL_PARALLEL',
   1,

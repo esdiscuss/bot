@@ -1,4 +1,5 @@
 import {Connection, sql} from '@databases/pg';
+import log from './logger';
 
 export interface DbMessage {
   id: number;
@@ -56,16 +57,28 @@ export default class Database {
       WHERE
         source_url = ${url};
     `);
-    console.log(`hasMessage(${url}) => ${count}`);
+    log({
+      event_status: 'ok',
+      event_type: 'has_message',
+      message: `hasMessage(${url}) => ${count !== 0}`,
+      source_url: url,
+      has_message: count !== 0,
+    });
     return count !== 0;
   }
 
   async insertMessage(m: Omit<DbMessage, 'id'>) {
-    console.log(`insertMessage(${m.source_url})`);
     await this.db.query(sql`
       INSERT INTO messages (topic_id, from_email, from_name, reply, sent_at, original_content, source_url, message_key)
 		    VALUES(${m.topic_id}, ${m.from_email}, ${m.from_name}, ${m.reply}, ${m.sent_at}, ${m.original_content}, ${m.source_url}, ${m.message_key})
     `);
+    log({
+      event_status: 'ok',
+      event_type: 'inserted_message',
+      message: `insertMessage(${m.source_url})`,
+      source_url: m.source_url,
+      inserted_message: m,
+    });
   }
 
   async getTopicByKey(key: string): Promise<DbTopic | undefined> {
@@ -80,12 +93,16 @@ export default class Database {
       WHERE
         topic_key = ${key};
     `);
-    console.log(`getTopicByKey(${key}) => ${topic?.slug}`);
+    log({
+      event_status: 'ok',
+      event_type: 'get_topic_by_key',
+      message: `getTopicByKey(${key}) => ${topic ? topic.topic_slug : 'null'}`,
+      topic,
+    });
     return topic;
   }
 
   async insertTopic(t: Omit<DbTopic, 'id'>): Promise<DbTopic> {
-    console.log(`insertTopic(${t.topic_slug})`);
     const [topicWithID] = await this.db.query(sql`
       INSERT INTO topics (topic_name, topic_slug, topic_key)
         VALUES (${t.topic_name}, ${t.topic_slug}, ${t.topic_key})
@@ -98,6 +115,12 @@ export default class Database {
           topic_slug,
           topic_key;
     `);
+    log({
+      event_status: 'ok',
+      event_type: 'upserted_topic',
+      message: `insertTopic(${t.topic_slug})`,
+      topic: topicWithID,
+    });
     return topicWithID;
   }
 
