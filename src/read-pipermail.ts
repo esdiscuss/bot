@@ -23,7 +23,7 @@ export default function messages(options: Options): ReadableStream<Message> {
     parallel: options.parallel,
     months: options.months,
     async filterMessage(url: string) {
-      return await db.hasMessage(url);
+      return (await db.hasMessage(url)) === false;
     },
   }).filter(function (message) {
     //filter spam
