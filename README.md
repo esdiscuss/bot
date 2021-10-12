@@ -1,3 +1,5 @@
+> This bot has been archived because the esdiscuss mailing list is no longer active: https://github.com/esdiscuss/esdiscuss.org/issues/384
+
 # pipermail-bot
 
 [![Build Status](https://img.shields.io/travis/esdiscuss/bot/master.svg)](https://travis-ci.org/esdiscuss/bot)
